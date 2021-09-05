@@ -27,16 +27,15 @@ function checkEmail(input) {
 }
 
 function checkRequired(inputs) {
-  let isRequired = false;
-  inputs.forEach((el) => {
+  return inputs.map((el) => {
     if (el.value.trim() === "") {
       showError(el, `${el.placeholder} is required`);
-      isRequired = true;
+      return { [el.id]: false };
     } else {
       showSuccess(el);
+      return { [el.id]: true };
     }
   });
-  return isRequired;
 }
 
 function checkLength(input, min, max) {
@@ -64,10 +63,22 @@ function checkPasswordMatch(input1, input2) {
 form.addEventListener("submit", function (e) {
   e.preventDefault();
 
-  if (!checkRequired([username, email, password, confirmPassword])) {
-    checkLength(username, 3, 15);
-    checkLength(password, 8, 25);
-    checkEmail(email);
-    checkPasswordMatch(password, confirmPassword);
-  }
+  const requiredFields = checkRequired([
+    username,
+    email,
+    password,
+    confirmPassword,
+  ]);
+  requiredFields.forEach((r) => {
+    if (r.username) {
+      checkLength(username, 3, 15);
+    }
+    if (r.password) {
+      checkLength(password, 8, 25);
+      checkPasswordMatch(password, confirmPassword);
+    }
+    if (r.email) {
+      checkEmail(email);
+    }
+  });
 });
